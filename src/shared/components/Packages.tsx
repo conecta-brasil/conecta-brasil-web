@@ -103,7 +103,7 @@ export function Packages() {
           </p>
         </div>
         <div className="flex justify-center mb-8">
-          <div className="inline-flex p-1 bg-amber-400 rounded-full">
+          <div className="inline-flex p-1 bg-amber-400 gap-2 rounded-full">
             <button
               onClick={() => setSelectedTab("todos")}
               className={`px-4 py-2 rounded-full font-medium ${
