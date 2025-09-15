@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MenuIcon, XIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -66,9 +67,9 @@ export function Header() {
               <MenuIcon className="h-6 w-6" />
             )}
           </button>
-          <button className="hidden md:block stellar-button">
+          <Link href="/login" className="hidden md:block stellar-button">
             Buy Now
-          </button>
+          </Link>
         </div>
       </div>
       {/* Mobile menu */}
@@ -105,9 +106,9 @@ export function Header() {
             >
               Social Impact
             </a>
-            <button className="mt-4 w-full stellar-button">
+            <Link href="/login" className="mt-4 w-full stellar-button block text-center">
               Buy Now
-            </button>
+            </Link>
           </div>
         </div>
       )}
