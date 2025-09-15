@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, Copy, CheckCircle } from "lucide-react";
 import Image from "next/image";
+import { QRCodeSVG } from "qrcode.react";
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -85,19 +86,14 @@ export function PaymentModal({ isOpen, onClose, packageName, packagePrice }: Pay
             {/* QR Code */}
             <div className="flex justify-center mb-6">
               <div className="bg-white p-4 rounded-lg border-2 border-gray-200">
-                <div className="w-48 h-48 bg-gray-100 flex items-center justify-center rounded">
-                  {/* QR Code placeholder - in a real app, you'd use a QR code library */}
-                  <div className="grid grid-cols-8 gap-1">
-                    {Array.from({ length: 64 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className={`w-2 h-2 ${
-                          Math.random() > 0.5 ? 'bg-black' : 'bg-white'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
+                <QRCodeSVG
+                  value={pixCode}
+                  size={192}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  level="M"
+                  includeMargin={false}
+                />
               </div>
             </div>
 
