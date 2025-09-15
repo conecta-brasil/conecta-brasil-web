@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Wallet, Clock, Wifi } from "lucide-react";
+import { Wallet, Clock, Wifi, LogOut } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export function DashboardStats() {
   const [xlmBalance] = useState("127.45"); // Mock XLM balance
   const [packageTime] = useState("02:00:00"); // Mock package time
   const [isConnecting, setIsConnecting] = useState(false);
+  const router = useRouter();
 
   const handleConnect = () => {
     setIsConnecting(true);
@@ -17,9 +19,37 @@ export function DashboardStats() {
     }, 3000);
   };
 
+  const handleLogout = () => {
+    // Redirect to login page
+    router.push("/login");
+  };
+
   return (
     <section className="py-16 bg-black text-white">
       <div className="container mx-auto px-4">
+        {/* Top Navigation with Logout */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center space-x-2">
+            <Image
+              src="/LOGO.jpg"
+              alt="ConectaBrasil Logo"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+            <span className="text-xl font-bold text-white">
+              ConectaBrasil
+            </span>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 border border-gray-700"
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Logout</span>
+          </button>
+        </div>
+
         {/* Welcome Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-4">
