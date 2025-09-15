@@ -70,7 +70,7 @@ export function Benefits() {
                 Our mission is to connect every corner of Brazil, from the Amazon to the cities, with fast and reliable internet. We believe that connectivity is a right, not a privilege.
               </p>
               <p className="text-gray-300 mb-6">
-                Using Stellar's blockchain technology, we make payments accessible to everyone, even those without traditional bank accounts. Just purchase your internet package with XLM and get connected instantly.
+                Using Stellar&apos;s blockchain technology, we make payments accessible to everyone, even those without traditional bank accounts. Just purchase your internet package with XLM and get connected instantly.
               </p>
               <button className="stellar-button">
                 Learn More About Our Network
