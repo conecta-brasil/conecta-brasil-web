@@ -77,10 +77,10 @@ export function HowItWorks() {
                 POWERED BY BLOCKCHAIN
               </h3>
               <p className="mb-4 text-gray-300">
-                Our platform leverages Stellar's blockchain technology to provide fast, secure, and transparent transactions. No middlemen, no unnecessary fees.
+                Our platform leverages Stellar&apos;s blockchain technology to provide fast, secure, and transparent transactions. No middlemen, no unnecessary fees.
               </p>
               <p className="mb-6 text-gray-300">
-                By using XLM, we're able to offer competitive pricing and instant confirmations, making internet access more accessible to everyone.
+                By using XLM, we&apos;re able to offer competitive pricing and instant confirmations, making internet access more accessible to everyone.
               </p>
               <div className="flex items-center space-x-4">
                 <Image
