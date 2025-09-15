@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ShoppingCart, Clock, Zap } from "lucide-react";
+import { PaymentModal } from "./PaymentModal";
 
 const packages = [
   {
@@ -48,14 +49,20 @@ const packages = [
 
 export function DashboardPackages() {
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<{name: string, price: string} | null>(null);
 
   const handlePurchase = (packageId: string) => {
-    setPurchasingId(packageId);
-    // Simulate purchase process
-    setTimeout(() => {
-      setPurchasingId(null);
-      // Here you would typically handle the actual purchase logic
-    }, 2000);
+    const pkg = packages.find(p => p.id === packageId);
+    if (pkg) {
+      setSelectedPackage({ name: pkg.name, price: pkg.price });
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPackage(null);
   };
 
   return (
@@ -123,28 +130,14 @@ export function DashboardPackages() {
 
               <button
                 onClick={() => handlePurchase(pkg.id)}
-                disabled={purchasingId === pkg.id}
-                className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
+                className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2 hover:transform hover:scale-[1.02] ${
                   pkg.popular
                     ? "bg-yellow-400 text-black hover:bg-yellow-300"
                     : "bg-gray-700 text-white hover:bg-gray-600"
-                } ${
-                  purchasingId === pkg.id
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:transform hover:scale-[1.02]"
                 }`}
               >
-                {purchasingId === pkg.id ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="h-4 w-4" />
-                    <span>Purchase</span>
-                  </>
-                )}
+                <ShoppingCart className="h-4 w-4" />
+                <span>Purchase</span>
               </button>
             </div>
           ))}
@@ -156,6 +149,16 @@ export function DashboardPackages() {
           </p>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      {selectedPackage && (
+        <PaymentModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          packageName={selectedPackage.name}
+          packagePrice={selectedPackage.price}
+        />
+      )}
     </section>
   );
 }
