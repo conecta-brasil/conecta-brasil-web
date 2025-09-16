@@ -5,31 +5,47 @@ import { Wallet, Clock, Wifi, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Countdown } from "./Countdown";
+import * as packagesApi from "@/shared/http/api/packages";
+
 type Props = {
   publicKey: string
   balance: number;
   packageTime: string;
+  orderId?: number;
 }
 
-export const DashboardStats: FC<Props> = ({ publicKey, balance, packageTime }) => {
+export const DashboardStats: FC<Props> = ({ publicKey, balance, packageTime, orderId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [connected, setConnected] = useState(false);
   const router = useRouter();
 
-  const handleConnect = () => {
+  const handleConnect = async () => {
+    if (!orderId) return;
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+
+    try {
+      await packagesApi.start({ ownerAddress: publicKey, orderId: orderId?.toString() });
       setConnected(true);
-    }, 3000);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDisconnect = () => {
+  const handleDisconnect = async () => {
+    if (!orderId) return;
+    
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await packagesApi.pause({ ownerAddress: publicKey, orderId: orderId?.toString() });
       setConnected(false);
-    }, 3000);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -146,9 +162,9 @@ export const DashboardStats: FC<Props> = ({ publicKey, balance, packageTime }) =
                     handleConnect();
                   }
                 }}
-                disabled={isLoading}
+                disabled={isLoading || !orderId}
                 className={`stellar-button flex items-center space-x-2 ${
-                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                  isLoading || !orderId ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
                 {isLoading ? (
