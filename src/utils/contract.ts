@@ -21,7 +21,6 @@ export const fundContract = async ({contractId}: FundContractParams) => {
     try {
         await rpc.getAccount(publicKey)
     } catch (e) {
-        console.log(e);
         await rpc.requestAirdrop(publicKey)
     }
 
@@ -46,7 +45,4 @@ export const fundContract = async ({contractId}: FundContractParams) => {
     }
 
     const res = await server.send(built!);
-
-    console.log(res);
-
 }

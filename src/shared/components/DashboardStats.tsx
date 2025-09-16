@@ -1,21 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { FC, useState } from "react";
 import { Wallet, Clock, Wifi, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Countdown } from "./Countdown";
+type Props = {
+  publicKey: string
+  balance: number;
+  packageTime: string;
+}
 
-export function DashboardStats() {
-  const [xlmBalance] = useState("127.45"); // Mock XLM balance
-  const [packageTime] = useState("02:00:00"); // Mock package time
-  const [isConnecting, setIsConnecting] = useState(false);
+export const DashboardStats: FC<Props> = ({ publicKey, balance, packageTime }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [connected, setConnected] = useState(false);
   const router = useRouter();
 
   const handleConnect = () => {
-    setIsConnecting(true);
-    // Simulate connection process
+    setIsLoading(true);
     setTimeout(() => {
-      setIsConnecting(false);
+      setIsLoading(false);
+      setConnected(true);
+    }, 3000);
+  };
+
+  const handleDisconnect = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setConnected(false);
     }, 3000);
   };
 
@@ -29,17 +42,26 @@ export function DashboardStats() {
       <div className="container mx-auto px-4">
         {/* Top Navigation with Logout */}
         <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center space-x-2">
-            <Image
-              src="/LOGO.jpg"
-              alt="ConectaBrasil Logo"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
-            <span className="text-xl font-bold text-white">
-              ConectaBrasil
-            </span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Image
+                src="/LOGO.jpg"
+                alt="ConectaBrasil Logo"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+              <span className="text-xl font-bold text-white">
+                ConectaBrasil
+              </span>
+            </div>
+            {publicKey && (
+              <div className="bg-gray-800 px-3 py-1 rounded-lg border border-gray-700">
+                <span className="text-sm text-yellow-400 font-mono">
+                  {publicKey.slice(0, 8)}...{publicKey.slice(-8)}
+                </span>
+              </div>
+            )}
           </div>
           <button
             onClick={handleLogout}
@@ -83,7 +105,7 @@ export function DashboardStats() {
               </div>
             </div>
             <div className="flex items-baseline">
-              <span className="text-4xl font-bold text-yellow-400">{xlmBalance}</span>
+              <span className="text-4xl font-bold text-yellow-400">{balance}</span>
               <span className="text-lg text-gray-400 ml-2">XLM</span>
             </div>
             <div className="mt-4 flex items-center">
@@ -110,42 +132,38 @@ export function DashboardStats() {
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-baseline">
-                <span className="text-4xl font-bold text-yellow-400 font-mono">{packageTime}</span>
+                <Countdown time={packageTime} start={connected}>
+                  {time => (
+                    <span className="text-4xl font-bold text-yellow-400 font-mono">{time}</span>
+                  )}
+                </Countdown>
               </div>
               <button
-                onClick={handleConnect}
-                disabled={isConnecting}
+                onClick={() => {
+                  if (connected) {
+                    handleDisconnect();
+                  } else {
+                    handleConnect();
+                  }
+                }}
+                disabled={isLoading}
                 className={`stellar-button flex items-center space-x-2 ${
-                  isConnecting ? "opacity-50 cursor-not-allowed" : ""
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {isConnecting ? (
+                {isLoading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
-                    <span>Connecting...</span>
+                    <span>{connected ? "Desconecting..." : "Connecting..."} </span>
                   </>
                 ) : (
                   <>
                     <Wifi className="h-4 w-4" />
-                    <span>Conectar</span>
+                    <span>{connected ? "Desconectar" : "Conectar"}</span>
                   </>
                 )}
               </button>
             </div>
-            <div className="mt-4">
-              <div className="bg-gray-800 rounded-full h-2">
-                <div className="bg-yellow-400 h-2 rounded-full" style={{ width: "75%" }}></div>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">75% remaining</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Connection Status */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center space-x-2 bg-gray-900 rounded-full px-6 py-3 border border-gray-800">
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-gray-300">Status: Ready to connect</span>
           </div>
         </div>
       </div>
