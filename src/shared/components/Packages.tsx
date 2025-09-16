@@ -5,85 +5,7 @@ import { CheckCircle } from "lucide-react";
 import { Package } from "../http/api/types";
 import { convertLumenToXlm } from "@/utils/xlm";
 import { formatName } from "@/utils/pakage";
-const packages = [
-  {
-    id: "1h",
-    name: "1 Hour",
-    price: "2,50",
-    features: [
-      "Unlimited internet",
-      "Speed up to 100 Mbps",
-      "Payment via Stellar (XLM)",
-    ],
-    popular: false,
-  },
-  {
-    id: "2h",
-    name: "2 Hours",
-    price: "4,50",
-    features: [
-      "Unlimited internet",
-      "Speed up to 100 Mbps",
-      "Payment via Stellar (XLM)",
-    ],
-    popular: false,
-  },
-  {
-    id: "1d",
-    name: "1 Day",
-    price: "9,90",
-    features: [
-      "Unlimited internet",
-      "Speed up to 100 Mbps",
-      "Payment via Stellar (XLM)",
-    ],
-    popular: true,
-  },
-  {
-    id: "15d",
-    name: "15 Days",
-    price: "49,90",
-    features: [
-      "Unlimited internet",
-      "Speed up to 100 Mbps",
-      "Payment via Stellar (XLM)",
-    ],
-    popular: false,
-  },
-  {
-    id: "1m",
-    name: "Monthly",
-    price: "89,90",
-    features: [
-      "Unlimited internet",
-      "Speed up to 100 Mbps",
-      "Payment via Stellar (XLM)",
-    ],
-    popular: false,
-  },
-  {
-    id: "3m",
-    name: "Quarterly",
-    price: "239,90",
-    features: [
-      "Unlimited internet",
-      "Speed up to 100 Mbps",
-      "Payment via Stellar (XLM)",
-    ],
-    popular: false,
-  },
-  {
-    id: "1y",
-    name: "Annual",
-    price: "799,90",
-    features: [
-      "Unlimited internet",
-      "Speed up to 100 Mbps",
-      "Payment via Stellar (XLM)",
-    ],
-    popular: false,
-  },
-];
+import { useRouter } from "next/navigation";
 
 const features = [
   "Unlimited internet",
@@ -93,6 +15,7 @@ const features = [
 
 export function Packages({packages}: {packages: Package[]}) {
   const [selectedTab, setSelectedTab] = useState("todos");
+  const router = useRouter();
 
   let filteredPackages = [];
 
@@ -185,6 +108,9 @@ export function Packages({packages}: {packages: Package[]}) {
                   ))}
                 </ul>
                 <button
+                  onClick={() => {
+                    router.push("/login");
+                  }}
                   className={`w-full py-2 rounded-full font-medium ${
                     pkg.is_popular
                       ? "bg-black text-yellow-400"

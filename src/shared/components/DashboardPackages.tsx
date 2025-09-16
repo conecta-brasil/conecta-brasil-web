@@ -57,7 +57,6 @@ type Props = {
 }
 
 export const DashboardPackages: FC<Props> = ({ publicKey, onPurchaseSuccess }) => {
-  const [purchasingId, setPurchasingId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<{id: number, name: string, price: number} | null>(null);
   const [packages, setPackages] = useState<Package[]>([]);
