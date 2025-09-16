@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [accountBalance, setAccountBalance] = useState<number>(0);
   const [packageTime, setPackageTime] = useState("00:00:00");
+  const [orderId, setOrderId] = useState<number | null>(null);
 
   const updateAccountBalance = useCallback(async () => {
     if (!publicKey) return;
@@ -38,6 +39,12 @@ export default function DashboardPage() {
         const remainingTime = await getRemainingTime({publicKey, orderId: order.order_id})
         return remainingTime.remaining;
       }));
+
+      const order = orders.find((order) => order.is_active);
+
+      if (order?.order_id) {
+        setOrderId(order.order_id);
+      }
 
       const remainingTime = remainingTimes.reduce((acc, time) => acc + time, 0);
 
@@ -79,7 +86,7 @@ export default function DashboardPage() {
     <div className="flex flex-col w-full min-h-screen bg-white">
       
       <main className="flex-grow">
-        <DashboardStats publicKey={publicKey || ""} balance={accountBalance} packageTime={packageTime} />
+        <DashboardStats publicKey={publicKey || ""} balance={accountBalance} packageTime={packageTime} orderId={orderId || 0} />
         <DashboardPackages publicKey={publicKey || ""} onPurchaseSuccess={async () => {
           await updateAccountBalance();
           await updatePackegeTime();
