@@ -26,6 +26,7 @@ export default function DashboardPage() {
       try {
         const { address } = await freighterApi.requestAccess();
         setPublicKey(address);
+        console.log(address)
       } catch (e) {
         console.error(e);
       }

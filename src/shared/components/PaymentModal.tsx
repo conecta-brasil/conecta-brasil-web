@@ -9,6 +9,7 @@ import freighterApi from "@stellar/freighter-api";
 import { TransactionBuilder } from "@stellar/stellar-sdk";
 import { Horizon } from "@stellar/stellar-sdk";
 import { convertLumenToXlm } from "@/utils/xlm";
+import * as orderPackagesApi from "../http/api/order-packages";
 
 const HORIZON_URL = "https://horizon-testnet.stellar.org";
 
@@ -39,17 +40,17 @@ export function PaymentModal({ publicKey, isOpen, onClose, packageId, packageNam
         address: publicKey,
       });
 
-    if (signError) {
-      return;
-    }
+      if (signError) {
+        return;
+      }
 
-    const server = new Horizon.Server(HORIZON_URL);
+      const server = new Horizon.Server(HORIZON_URL);
 
-    const transaction = TransactionBuilder.fromXDR(signedTxXdr, HORIZON_URL);
+      const transaction = TransactionBuilder.fromXDR(signedTxXdr, HORIZON_URL);
 
-    const result = await server.submitTransaction(transaction);
+      await server.submitTransaction(transaction);
 
-    await onPurchaseSuccess?.();
+      await onPurchaseSuccess?.();
 
     } catch (e) {
       console.error(e);

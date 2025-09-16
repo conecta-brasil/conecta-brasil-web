@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from "react";
 import { ShoppingCart, Clock, Zap } from "lucide-react";
 import { PaymentModal } from "./PaymentModal";
 import { Package } from "../http/api/types";
-import { getAll } from "../http/api/packages";
+import * as packagesApi from "../http/api/packages";
 import { convertLumenToXlm } from "@/utils/xlm";
 import { formatName } from "@/utils/pakage";
 
@@ -65,7 +65,7 @@ export const DashboardPackages: FC<Props> = ({ publicKey, onPurchaseSuccess }) =
   useEffect(() => {
     (async () => {
       try {
-        const packages = await getAll();
+        const packages = await packagesApi.getAll();
         setPackages(packages);
       } catch (e) {
         console.error(e);
@@ -75,6 +75,7 @@ export const DashboardPackages: FC<Props> = ({ publicKey, onPurchaseSuccess }) =
 
   const handlePurchase = (packageId: number) => {
     const pkg = packages.find(p => p.id === packageId);
+
     if (pkg) {
       setSelectedPackage({ id: pkg.id, name: pkg.name, price: pkg.price });
       setIsModalOpen(true);
