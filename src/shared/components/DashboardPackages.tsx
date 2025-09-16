@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { ShoppingCart, Clock, Zap } from "lucide-react";
 import { PaymentModal } from "./PaymentModal";
+import { Package } from "../http/api/types";
+import { getAll } from "../http/api/packages";
+import { convertLumenToXlm } from "@/utils/xlm";
+import { formatName } from "@/utils/pakage";
 
 const packages = [
   {
-    id: "1h",
+    id: 1,
     name: "1 Hour",
     price: "2,50",
     duration: "01:00:00",
@@ -14,7 +18,7 @@ const packages = [
     popular: false,
   },
   {
-    id: "2h",
+    id: 2,
     name: "2 Hours", 
     price: "4,50",
     duration: "02:00:00",
@@ -22,7 +26,7 @@ const packages = [
     popular: false,
   },
   {
-    id: "1d",
+    id: 3,
     name: "1 Day",
     price: "9,90",
     duration: "24:00:00",
@@ -30,7 +34,7 @@ const packages = [
     popular: true,
   },
   {
-    id: "15d",
+    id: 4,
     name: "15 Days",
     price: "49,90",
     duration: "360:00:00",
@@ -38,7 +42,7 @@ const packages = [
     popular: false,
   },
   {
-    id: "1m",
+    id: 5,
     name: "Monthly",
     price: "89,90",
     duration: "720:00:00",
@@ -47,15 +51,32 @@ const packages = [
   },
 ];
 
-export function DashboardPackages() {
-  const [purchasingId, setPurchasingId] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState<{name: string, price: string} | null>(null);
+type Props = {
+  publicKey: string;
+  onPurchaseSuccess?: () => Promise<void>;
+}
 
-  const handlePurchase = (packageId: string) => {
+export const DashboardPackages: FC<Props> = ({ publicKey, onPurchaseSuccess }) => {
+  const [purchasingId, setPurchasingId] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<{id: number, name: string, price: number} | null>(null);
+  const [packages, setPackages] = useState<Package[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const packages = await getAll();
+        setPackages(packages);
+      } catch (e) {
+        console.error(e);
+      }
+    })()
+  }, [])
+
+  const handlePurchase = (packageId: number) => {
     const pkg = packages.find(p => p.id === packageId);
     if (pkg) {
-      setSelectedPackage({ name: pkg.name, price: pkg.price });
+      setSelectedPackage({ id: pkg.id, name: pkg.name, price: pkg.price });
       setIsModalOpen(true);
     }
   };
@@ -82,12 +103,12 @@ export function DashboardPackages() {
             <div
               key={pkg.id}
               className={`relative bg-gray-800 rounded-2xl p-6 border transition-all duration-300 hover:scale-105 ${
-                pkg.popular
+                pkg.is_popular
                   ? "border-yellow-400 ring-2 ring-yellow-400/50"
                   : "border-gray-700 hover:border-gray-600"
               }`}
             >
-              {pkg.popular && (
+              {pkg.is_popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-semibold">
                     Most Popular
@@ -97,11 +118,11 @@ export function DashboardPackages() {
 
               <div className="text-center mb-6">
                 <h3 className="text-xl font-bold text-white mb-2">
-                  {pkg.name}
+                  {formatName(pkg.name)}
                 </h3>
                 <div className="flex items-baseline justify-center mb-4">
                   <span className="text-3xl font-bold text-yellow-400">
-                    R${pkg.price}
+                    {convertLumenToXlm(pkg.price)} xlm
                   </span>
                   <span className="text-gray-400 ml-1">/package</span>
                 </div>
@@ -114,7 +135,7 @@ export function DashboardPackages() {
                     <span className="text-gray-300">Duration</span>
                   </div>
                   <span className="text-white font-mono font-semibold">
-                    {pkg.duration}
+                    {formatName(pkg.name)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -123,7 +144,7 @@ export function DashboardPackages() {
                     <span className="text-gray-300">Speed</span>
                   </div>
                   <span className="text-white font-semibold">
-                    {pkg.speed}
+                    {pkg.speed_message}
                   </span>
                 </div>
               </div>
@@ -131,7 +152,7 @@ export function DashboardPackages() {
               <button
                 onClick={() => handlePurchase(pkg.id)}
                 className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2 hover:transform hover:scale-[1.02] ${
-                  pkg.popular
+                  pkg.is_popular
                     ? "bg-yellow-400 text-black hover:bg-yellow-300"
                     : "bg-gray-700 text-white hover:bg-gray-600"
                 }`}
@@ -153,10 +174,13 @@ export function DashboardPackages() {
       {/* Payment Modal */}
       {selectedPackage && (
         <PaymentModal
+          publicKey={publicKey}
           isOpen={isModalOpen}
           onClose={handleCloseModal}
+          packageId={selectedPackage.id}
           packageName={selectedPackage.name}
           packagePrice={selectedPackage.price}
+          onPurchaseSuccess={onPurchaseSuccess}
         />
       )}
     </section>

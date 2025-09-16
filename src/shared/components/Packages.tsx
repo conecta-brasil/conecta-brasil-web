@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { CheckCircle } from "lucide-react";
+import { Package } from "../http/api/types";
+import { convertLumenToXlm } from "@/utils/xlm";
+import { formatName } from "@/utils/pakage";
 const packages = [
   {
     id: "1h",
@@ -82,14 +85,24 @@ const packages = [
   },
 ];
 
-export function Packages() {
+const features = [
+  "Unlimited internet",
+  "Speed up to 100 Mbps",
+  "Payment via Stellar (XLM)",
+]
+
+export function Packages({packages}: {packages: Package[]}) {
   const [selectedTab, setSelectedTab] = useState("todos");
-  const filteredPackages =
-    selectedTab === "todos"
-      ? packages
-      : selectedTab === "curtos"
-      ? packages.slice(0, 3)
-      : packages.slice(3);
+
+  let filteredPackages = [];
+
+  if (selectedTab === "todos") {
+    filteredPackages = packages;
+  } else if (selectedTab === "curtos") {
+    filteredPackages = packages.filter((pkg) => pkg.duration_secs <= 86400);
+  } else {
+    filteredPackages = packages.filter((pkg) => pkg.duration_secs > 86400);
+  }
 
   return (
     <section id="pacotes" className="py-16 bg-yellow-400">
@@ -141,12 +154,12 @@ export function Packages() {
             <div
               key={pkg.id}
               className={`rounded-lg overflow-hidden border ${
-                pkg.popular
+                pkg.is_popular
                   ? "border-black ring-2 ring-black"
                   : "border-transparent"
               } bg-white shadow-xl`}
             >
-              {pkg.popular && (
+              {pkg.is_popular && (
                 <div className="bg-black text-yellow-400 text-center py-1">
                   <span className="text-sm font-medium uppercase">
                     Mais Popular
@@ -155,16 +168,16 @@ export function Packages() {
               )}
               <div className="p-6">
                 <h3 className="text-xl font-bold text-black mb-2">
-                  {pkg.name}
+                  {formatName(pkg.name)}
                 </h3>
                 <div className="flex items-baseline mb-4">
                   <span className="text-3xl font-bold text-black">
-                    R${pkg.price}
+                    {convertLumenToXlm(pkg.price)} xlm
                   </span>
                   <span className="text-gray-500 ml-1">/pacote</span>
                 </div>
                 <ul className="mb-6 space-y-2">
-                  {pkg.features.map((feature, idx) => (
+                  {features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
                       <CheckCircle className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0" />
                       <span className="text-gray-700">{feature}</span>
@@ -173,7 +186,7 @@ export function Packages() {
                 </ul>
                 <button
                   className={`w-full py-2 rounded-full font-medium ${
-                    pkg.popular
+                    pkg.is_popular
                       ? "bg-black text-yellow-400"
                       : "bg-gray-100 hover:bg-yellow-400 hover:text-black text-gray-800"
                   }`}

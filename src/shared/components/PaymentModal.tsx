@@ -1,23 +1,60 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, Copy, CheckCircle } from "lucide-react";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
+import { createPurchase } from "../http/api/purchases";
+import freighterApi from "@stellar/freighter-api";
+import { TransactionBuilder } from "@stellar/stellar-sdk";
+import { Horizon } from "@stellar/stellar-sdk";
+import { convertLumenToXlm } from "@/utils/xlm";
+
+const HORIZON_URL = "https://horizon-testnet.stellar.org";
 
 interface PaymentModalProps {
+  publicKey: string;
   isOpen: boolean;
   onClose: () => void;
+  packageId: number; 
   packageName: string;
-  packagePrice: string;
+  packagePrice: number;
+  onPurchaseSuccess?: () => Promise<void>;
 }
 
-export function PaymentModal({ isOpen, onClose, packageName, packagePrice }: PaymentModalProps) {
+export function PaymentModal({ publicKey, isOpen, onClose, packageId, packageName, packagePrice, onPurchaseSuccess }: PaymentModalProps) {
   const [showQR, setShowQR] = useState(true);
   const [copied, setCopied] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   
   const pixCode = `00020126580014BR.GOV.BCB.PIX013636c7f4e6-f24d-4dcb-aa73-c531b2b9b4a65204000053039865802BR5925CONECTA BRASIL INTERNET6009SAO PAULO62070503***63041D3D`;
+
+  const makePurchase = useCallback(async () => {
+    try {
+      const purchase = await createPurchase({ packageId: packageId.toString(), userId: publicKey });
+
+      const { signedTxXdr, error: signError } =
+      await freighterApi.signTransaction(purchase.unsignedXdr, {
+        networkPassphrase: "Test SDF Network ; September 2015",
+        address: publicKey,
+      });
+
+    if (signError) {
+      return;
+    }
+
+    const server = new Horizon.Server(HORIZON_URL);
+
+    const transaction = TransactionBuilder.fromXDR(signedTxXdr, HORIZON_URL);
+
+    const result = await server.submitTransaction(transaction);
+
+    await onPurchaseSuccess?.();
+
+    } catch (e) {
+      console.error(e);
+    }
+  }, [publicKey, packageId]);
 
   useEffect(() => {
     if (isOpen) {
@@ -25,21 +62,18 @@ export function PaymentModal({ isOpen, onClose, packageName, packagePrice }: Pay
       setIsProcessing(false);
       setCopied(false);
       
-      // After 4 seconds, switch to loading
-      const timer = setTimeout(() => {
+      const timer = setTimeout(async() => {
         setShowQR(false);
         setIsProcessing(true);
         
-        // After additional 3 seconds, complete the process
-        setTimeout(() => {
-          setIsProcessing(false);
-          onClose();
-        }, 3000);
+        await makePurchase();
+
+        onClose();
       }, 4000);
 
       return () => clearTimeout(timer);
     }
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, makePurchase]);
 
   const handleCopyPix = () => {
     navigator.clipboard.writeText(pixCode);
@@ -79,7 +113,7 @@ export function PaymentModal({ isOpen, onClose, packageName, packagePrice }: Pay
               </div>
               <div className="flex justify-between items-center mt-2">
                 <span className="text-gray-700">Amount:</span>
-                <span className="font-bold text-2xl text-green-600">R$ {packagePrice}</span>
+                <span className="font-bold text-2xl text-green-600">{convertLumenToXlm(packagePrice)} xlm</span>
               </div>
             </div>
 
@@ -147,7 +181,7 @@ export function PaymentModal({ isOpen, onClose, packageName, packagePrice }: Pay
                 </div>
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-gray-700">Amount:</span>
-                  <span className="font-bold text-green-600">R$ {packagePrice}</span>
+                  <span className="font-bold text-green-600">{convertLumenToXlm(packagePrice)} xlm</span>
                 </div>
               </div>
             </div>

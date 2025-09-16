@@ -10,6 +10,8 @@ const envSchema = z.object({
   mercuryProjectName: z.string().min(1, "Mercury project name is required"),
   mercuryUrl: z.url("Mercury URL must be a valid URL"),
   mercuryJwt: z.string().min(1, "Mercury JWT is required"),
+  horizonUrl: z.url("Horizon URL must be a valid URL"),
+  apiUrl: z.url("API URL must be a valid URL"),
 });
 
 const config = {
@@ -22,6 +24,8 @@ const config = {
   mercuryProjectName: process.env.NEXT_PUBLIC_MERCURY_PROJECT_NAME,
   mercuryUrl: process.env.NEXT_PUBLIC_MERCURY_URL,
   mercuryJwt: process.env.NEXT_PUBLIC_MERCURY_JWT,
+  horizonUrl: process.env.NEXT_PUBLIC_HORIZON_URL,
+  apiUrl: process.env.NEXT_PUBLIC_API_URL,
 };
 
 export const env = envSchema.parse(config);

@@ -5,8 +5,10 @@ import { Hero } from "@/shared/components/Hero";
 import { HowItWorks } from "@/shared/components/HowItWorks";
 import { Packages } from "@/shared/components/Packages";
 import { SocialImpact } from "@/shared/components/SocialImpact";
+import { getAll } from "@/shared/http/api/packages/get-all";
 
 export default async function Home() {
+    const packages = await getAll();
 
   return (
       <div className="flex flex-col w-full min-h-screen bg-white">
@@ -14,7 +16,7 @@ export default async function Home() {
 
         <main className="flex-grow">
           <Hero />
-          <Packages />
+          <Packages packages={packages}/>
           <Benefits />
           <HowItWorks />
           <SocialImpact />

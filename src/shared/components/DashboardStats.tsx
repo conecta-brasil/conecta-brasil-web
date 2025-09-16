@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { FC, useState } from "react";
 import { Wallet, Clock, Wifi, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-export function DashboardStats() {
-  const [xlmBalance] = useState("127.45"); // Mock XLM balance
+type Props = {
+  publicKey: string
+  balance: number;
+}
+
+export const DashboardStats: FC<Props> = ({ publicKey, balance }) => {
   const [packageTime] = useState("02:00:00"); // Mock package time
   const [isConnecting, setIsConnecting] = useState(false);
   const router = useRouter();
@@ -29,17 +33,26 @@ export function DashboardStats() {
       <div className="container mx-auto px-4">
         {/* Top Navigation with Logout */}
         <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center space-x-2">
-            <Image
-              src="/LOGO.jpg"
-              alt="ConectaBrasil Logo"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
-            <span className="text-xl font-bold text-white">
-              ConectaBrasil
-            </span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Image
+                src="/LOGO.jpg"
+                alt="ConectaBrasil Logo"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+              <span className="text-xl font-bold text-white">
+                ConectaBrasil
+              </span>
+            </div>
+            {publicKey && (
+              <div className="bg-gray-800 px-3 py-1 rounded-lg border border-gray-700">
+                <span className="text-sm text-yellow-400 font-mono">
+                  {publicKey.slice(0, 8)}...{publicKey.slice(-8)}
+                </span>
+              </div>
+            )}
           </div>
           <button
             onClick={handleLogout}
@@ -83,7 +96,7 @@ export function DashboardStats() {
               </div>
             </div>
             <div className="flex items-baseline">
-              <span className="text-4xl font-bold text-yellow-400">{xlmBalance}</span>
+              <span className="text-4xl font-bold text-yellow-400">{balance}</span>
               <span className="text-lg text-gray-400 ml-2">XLM</span>
             </div>
             <div className="mt-4 flex items-center">
